@@ -36,7 +36,7 @@ function createTree(data) {
     const svg = d3.select("#tree-container")
         .append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", [height - height/10]);
 
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},50)`);
