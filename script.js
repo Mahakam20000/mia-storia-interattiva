@@ -33,15 +33,21 @@ function createTree(data) {
     const width = document.getElementById('tree-container').offsetWidth;
     const height = document.getElementById('tree-container').offsetHeight;
 
+    // Riduciamo l'altezza dell'albero all'80% dell'altezza del contenitore
+    const treeHeight = height * 0.8;
+    
+    // Calcoliamo il margine verticale per centrare l'albero
+    const verticalMargin = (height - treeHeight) / 2;
+
     const svg = d3.select("#tree-container")
         .append("svg")
         .attr("width", width)
         .attr("height", height);
 
     const g = svg.append("g")
-        .attr("transform", `translate(${width / 2},50)`);
+        .attr("transform", `translate(${width / 2},${verticalMargin})`);
 
-    const tree = d3.tree().size([width - 100, height - height/10 ]);
+    const tree = d3.tree().size([width - 100, treeHeight]);
 
     const root = d3.hierarchy(data, d => d.choices);
     tree(root);
@@ -78,6 +84,12 @@ function createTree(data) {
         });
 
     svg.call(zoom);
+
+    // Centra inizialmente l'albero
+    const initialScale = 0.8;
+    const initialTranslateX = (width - width * initialScale) / 2;
+    const initialTranslateY = (height - treeHeight * initialScale) / 2;
+    svg.call(zoom.transform, d3.zoomIdentity.translate(initialTranslateX, initialTranslateY).scale(initialScale));
 }
 
 // Funzione per aggiornare la storia
