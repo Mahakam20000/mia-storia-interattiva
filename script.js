@@ -2,25 +2,59 @@
 const storyData = {
     id: 1,
     title: "Inizio dell'avventura",
-    image: "https://mahakam20000.github.io/mia-storia-interattiva/images/1.jpg",
+    image: "images/1.jpg",
     text: "Ti trovi all'ingresso di una caverna misteriosa. Cosa fai?",
     choices: [
         {
             id: 2,
             title: "Entra nella caverna",
-            image: "https://mahakam20000.github.io/mia-storia-interattiva/images/2.jpg",
-            text: "Entri nella caverna oscura...",
+            image: "images/2.jpg",
+            text: "Entri nella caverna oscura. L'aria è umida e fredda.",
             choices: [
-                // Altre scelte qui
+                {
+                    id: 4,
+                    title: "Accendi una torcia",
+                    image: "images/4.jpg",
+                    text: "Accendi una torcia. La luce rivela antiche iscrizioni sulle pareti.",
+                    choices: [
+                        // Puoi aggiungere ulteriori scelte qui
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "Procedi al buio",
+                    image: "images/5.jpg",
+                    text: "Decidi di procedere al buio. Inciampi su qualcosa...",
+                    choices: [
+                        // Puoi aggiungere ulteriori scelte qui
+                    ]
+                }
             ]
         },
         {
             id: 3,
             title: "Esplora i dintorni",
-            image: "https://mahakam20000.github.io/mia-storia-interattiva/images/3.jpg",
-            text: "Decidi di esplorare l'area circostante...",
+            image: "images/3.jpg",
+            text: "Decidi di esplorare l'area circostante. Noti un sentiero nascosto.",
             choices: [
-                // Altre scelte qui
+                {
+                    id: 6,
+                    title: "Segui il sentiero",
+                    image: "images/6.jpg",
+                    text: "Segui il sentiero nascosto. Ti conduce a una radura segreta.",
+                    choices: [
+                        // Puoi aggiungere ulteriori scelte qui
+                    ]
+                },
+                {
+                    id: 7,
+                    title: "Torna all'ingresso della caverna",
+                    image: "images/7.jpg",
+                    text: "Decidi di tornare all'ingresso della caverna. Cosa fai ora?",
+                    choices: [
+                        // Questa scelta potrebbe riportare al nodo iniziale o offrire nuove opzioni
+                    ]
+                }
             ]
         }
     ]
