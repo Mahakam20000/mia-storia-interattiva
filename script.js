@@ -6,7 +6,7 @@ const storyData = {
             title: "Inizio dell'avventura",
             image: "images/1.jpg",
             text: "Ti trovi all'ingresso di una caverna misteriosa. Cosa fai?",
-            choices: [2, 3]
+            choices: [2, 3, 4]
         },
         2: {
             id: 2,
