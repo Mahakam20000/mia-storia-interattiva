@@ -7,7 +7,7 @@ function App() {
       <header className="bg-gray-800 text-white p-4 text-center">
         <h1 className="text-2xl font-bold">La Mia Storia Interattiva</h1>
       </header>
-      <main>
+      <main className="h-[calc(100vh-4rem)]">
         <StoryNavigator />
       </main>
     </div>
