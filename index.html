@@ -1,1 +1,31 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="icon" href="/mia-storia-interattiva/favicon.ico"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="theme-color" content="#000000"/><meta name="description" content="Web site created using create-react-app"/><link rel="apple-touch-icon" href="/mia-storia-interattiva/logo192.png"/><link rel="manifest" href="/mia-storia-interattiva/manifest.json"/><title>React App</title><script defer="defer" src="/mia-storia-interattiva/static/js/main.d31d911a.js"></script><link href="/mia-storia-interattiva/static/css/main.e6c13ad2.css" rel="stylesheet"></head><body><noscript>You need to enable JavaScript to run this app.</noscript><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storia Interattiva</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div id="desktop-view">
+        <div id="tree-container"></div>
+        <div id="story-panel" class="hidden">
+            <h2 id="story-title"></h2>
+            <img id="story-image" src="" alt="Immagine della storia">
+            <p id="story-text"></p>
+        </div>
+    </div>
+    <div id="mobile-view" class="hidden">
+        <header>
+            <img id="mobile-image" src="" alt="Immagine della storia">
+            <h1 id="mobile-title"></h1>
+        </header>
+        <main>
+            <p id="mobile-text"></p>
+            <div id="mobile-choices"></div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
