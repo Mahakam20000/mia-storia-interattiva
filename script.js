@@ -41,7 +41,7 @@ function createTree(data) {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},50)`);
 
-    const tree = d3.tree().size([width - 100, height - height/10]);
+    const tree = d3.tree().size([width - 100, height - height/10 ]);
 
     const root = d3.hierarchy(data, d => d.choices);
     tree(root);
