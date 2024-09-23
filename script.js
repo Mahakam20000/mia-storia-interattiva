@@ -43,7 +43,7 @@ function createTree(data) {
 
     const tree = d3.tree().size([width - 100, height - 100]);
 
-    const root = d3.hierarchy(data);
+    const root = d3.hierarchy(data, d => d.choices);
     tree(root);
 
     const link = g.selectAll(".link")
@@ -69,6 +69,15 @@ function createTree(data) {
         .attr("y", d => d.children ? -20 : 20)
         .style("text-anchor", "middle")
         .text(d => d.data.title);
+
+    // Aggiungi zoom e pan
+    const zoom = d3.zoom()
+        .scaleExtent([0.5, 3])
+        .on("zoom", (event) => {
+            g.attr("transform", event.transform);
+        });
+
+    svg.call(zoom);
 }
 
 // Funzione per aggiornare la storia
