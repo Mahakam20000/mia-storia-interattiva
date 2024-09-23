@@ -2,13 +2,13 @@
 const storyData = {
     id: 1,
     title: "Inizio dell'avventura",
-    image: "https://example.com/start.jpg",
+    image: "https://mahakam20000.github.io/mia-storia-interattiva/images/1.jpg",
     text: "Ti trovi all'ingresso di una caverna misteriosa. Cosa fai?",
     choices: [
         {
             id: 2,
             title: "Entra nella caverna",
-            image: "https://example.com/cave.jpg",
+            image: "https://mahakam20000.github.io/mia-storia-interattiva/images/2.jpg",
             text: "Entri nella caverna oscura...",
             choices: [
                 // Altre scelte qui
@@ -17,7 +17,7 @@ const storyData = {
         {
             id: 3,
             title: "Esplora i dintorni",
-            image: "https://example.com/surroundings.jpg",
+            image: "https://mahakam20000.github.io/mia-storia-interattiva/images/3.jpg",
             text: "Decidi di esplorare l'area circostante...",
             choices: [
                 // Altre scelte qui
