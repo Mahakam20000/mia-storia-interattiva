@@ -36,12 +36,12 @@ function createTree(data) {
     const svg = d3.select("#tree-container")
         .append("svg")
         .attr("width", width)
-        .attr("height", [height - height/10]);
+        .attr("height", height);
 
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},50)`);
 
-    const tree = d3.tree().size([width - 100, height - 100]);
+    const tree = d3.tree().size([width - 100, height - height/10]);
 
     const root = d3.hierarchy(data, d => d.choices);
     tree(root);
