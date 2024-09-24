@@ -67,11 +67,7 @@ let currentNode = storyData;
 function createTree(data) {
     const width = document.getElementById('tree-container').offsetWidth;
     const height = document.getElementById('tree-container').offsetHeight;
-
-    // Riduciamo l'altezza dell'albero all'80% dell'altezza del contenitore
     const treeHeight = height * 0.8;
-    
-    // Calcoliamo il margine verticale per centrare l'albero
     const verticalMargin = (height - treeHeight) / 2;
 
     const svg = d3.select("#tree-container")
@@ -88,26 +84,27 @@ function createTree(data) {
     // Function to get or create a node
     function getNode(id) {
         if (!nodeMap.has(id)) {
-            nodeMap.set(id, { id, children: [] });
+            nodeMap.set(id, { id, title: data.nodes[id].title, children: [] });
         }
         return nodeMap.get(id);
     }
 
     // Build the graph structure
-    Object.values(data.nodes).forEach(node => {
-        const parent = getNode(node.id);
-        parent.title = node.title;
-        node.choices.forEach(childId => {
-            const child = getNode(childId);
-            if (!parent.children.includes(child)) {
-                parent.children.push(child);
+    Object.keys(data.nodes).forEach(id => {
+        const node = getNode(id);
+        data.nodes[id].choices.forEach(childId => {
+            if (childId !== id) {  // Prevent self-referencing
+                const child = getNode(childId);
+                if (!node.children.includes(child)) {
+                    node.children.push(child);
+                }
             }
         });
     });
 
+    // Create a tree layout
     const root = d3.hierarchy(getNode(data.rootId));
-
-    const tree = d3.tree().size([width - 100, treeHeight]).nodeSize([80, 200]);
+    const tree = d3.tree().size([width - 100, treeHeight]);
     tree(root);
 
     // Create links
