@@ -78,32 +78,26 @@ function createTree(data) {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${verticalMargin})`);
 
-    // Create a map to store unique nodes
-    const nodeMap = new Map();
+    // Create all nodes upfront
+    const nodes = Object.keys(data.nodes).map(id => ({
+        id: id,
+        title: data.nodes[id].title,
+        children: []
+    }));
 
-    // Function to get or create a node
-    function getNode(id) {
-        if (!nodeMap.has(id)) {
-            nodeMap.set(id, { id, title: data.nodes[id].title, children: [] });
-        }
-        return nodeMap.get(id);
-    }
+    // Create a map for quick node lookup
+    const nodeMap = new Map(nodes.map(node => [node.id, node]));
 
-    // Build the graph structure
-    Object.keys(data.nodes).forEach(id => {
-        const node = getNode(id);
-        data.nodes[id].choices.forEach(childId => {
-            if (childId !== id) {  // Prevent self-referencing
-                const child = getNode(childId);
-                if (!node.children.includes(child)) {
-                    node.children.push(child);
-                }
-            }
-        });
+    // Build the tree structure
+    nodes.forEach(node => {
+        const choices = data.nodes[node.id].choices;
+        node.children = choices.map(childId => nodeMap.get(childId)).filter(Boolean);
     });
 
+    // Create the hierarchy
+    const root = d3.hierarchy(nodeMap.get(data.rootId));
+
     // Create a tree layout
-    const root = d3.hierarchy(getNode(data.rootId));
     const tree = d3.tree().size([width - 100, treeHeight]);
     tree(root);
 
