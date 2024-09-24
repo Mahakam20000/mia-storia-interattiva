@@ -64,11 +64,12 @@ const storyData = {
 let currentNode = storyData;
 
 // Funzione per creare l'albero usando D3.js
-function createTree(data) {
+function createTree(data, currentNodeId) {
     const width = document.getElementById('tree-container').offsetWidth;
     const height = document.getElementById('tree-container').offsetHeight;
-    const treeHeight = height * 0.8;
-    const verticalMargin = (height - treeHeight) / 2;
+
+    // Pulisci il contenitore
+    d3.select("#tree-container").selectAll("*").remove();
 
     const svg = d3.select("#tree-container")
         .append("svg")
@@ -76,67 +77,52 @@ function createTree(data) {
         .attr("height", height);
 
     const g = svg.append("g")
-        .attr("transform", `translate(${width / 2},${verticalMargin})`);
+        .attr("transform", `translate(${width / 2},${height / 2})`);
 
-    // Crea una mappa di tutti i nodi
-    const nodeMap = new Map(Object.entries(data.nodes).map(([id, node]) => [id, { ...node, children: [] }]));
+    const currentNode = data.nodes[currentNodeId];
+    const nodeData = [
+        { id: currentNodeId, title: currentNode.title, x: 0, y: 0 }
+    ];
 
-    // Costruisci le relazioni genitore-figlio
-    nodeMap.forEach(node => {
-        node.choices.forEach(childId => {
-            if (nodeMap.has(childId.toString())) {
-                node.children.push(nodeMap.get(childId.toString()));
-            }
-        });
+    const linkData = [];
+
+    // Aggiungi i nodi delle scelte
+    const choiceCount = currentNode.choices.length;
+    const radius = Math.min(width, height) / 4;
+    currentNode.choices.forEach((choiceId, index) => {
+        const angle = (index / choiceCount) * 2 * Math.PI - Math.PI / 2;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        nodeData.push({ id: choiceId, title: data.nodes[choiceId].title, x, y });
+        linkData.push({ source: { x: 0, y: 0 }, target: { x, y } });
     });
 
-    // Crea la gerarchia D3
-    const root = d3.hierarchy(nodeMap.get(data.rootId.toString()));
-
-    // Crea il layout dell'albero
-    const treeLayout = d3.tree().size([width - 100, treeHeight]);
-    treeLayout(root);
-
     // Crea i collegamenti
-    const link = g.selectAll(".link")
-        .data(root.links())
-        .enter().append("path")
+    g.selectAll(".link")
+        .data(linkData)
+        .enter().append("line")
         .attr("class", "link")
-        .attr("d", d3.linkVertical()
-            .x(d => d.x)
-            .y(d => d.y));
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
 
     // Crea i nodi
     const node = g.selectAll(".node")
-        .data(root.descendants())
+        .data(nodeData)
         .enter().append("g")
         .attr("class", "node")
-        .attr("transform", d => `translate(${d.x},${d.y})`);
+        .attr("transform", d => `translate(${d.x},${d.y})`)
+        .on("click", (event, d) => updateStory(data.nodes[d.id]));
 
     node.append("circle")
-        .attr("r", 10)
-        .on("click", (event, d) => updateStory(d.data));
+        .attr("r", 10);
 
     node.append("text")
         .attr("dy", ".35em")
-        .attr("y", d => d.children ? -20 : 20)
+        .attr("y", d => d.id === currentNodeId ? -20 : 20)
         .style("text-anchor", "middle")
-        .text(d => d.data.title);
-
-    // Aggiungi zoom e pan
-    const zoom = d3.zoom()
-        .scaleExtent([0.5, 3])
-        .on("zoom", (event) => {
-            g.attr("transform", event.transform);
-        });
-
-    svg.call(zoom);
-
-    // Centra l'albero inizialmente
-    const initialScale = 0.8;
-    const initialTranslateX = (width - width * initialScale) / 2;
-    const initialTranslateY = (height - treeHeight * initialScale) / 2;
-    svg.call(zoom.transform, d3.zoomIdentity.translate(initialTranslateX, initialTranslateY).scale(initialScale));
+        .text(d => d.title);
 }
 
 // Funzione per aggiornare la storia
@@ -165,16 +151,19 @@ function updateStory(node) {
         button.onclick = () => updateStory(choice);
         choicesContainer.appendChild(button);
     });
+
+    // Aggiorna la visualizzazione dell'albero
+    createTree(storyData, node.id);
 }
+
 
 // Inizializza l'applicazione
 window.onload = () => {
-    createTree(storyData);
-    updateStory(storyData);
+    createTree(storyData, storyData.rootId);
+    updateStory(storyData.nodes[storyData.rootId]);
 };
 
 // Gestione del ridimensionamento della finestra
 window.onresize = () => {
-    document.getElementById("tree-container").innerHTML = "";
-    createTree(storyData);
+    createTree(storyData, currentNode.id);
 };
