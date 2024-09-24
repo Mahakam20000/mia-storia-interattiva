@@ -33,6 +33,7 @@ body, html {
     fill: #fff;
     stroke: steelblue;
     stroke-width: 3px;
+    cursor: pointer;
 }
 
 .node text {

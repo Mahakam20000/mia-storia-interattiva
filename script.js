@@ -82,40 +82,48 @@ function createTree(data) {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${verticalMargin})`);
 
-    // Funzione per costruire la gerarchia
-    function buildHierarchy(nodeId, visited = new Set()) {
-        if (visited.has(nodeId)) {
-            // Se il nodo è già stato visitato, ritorniamo un riferimento
-            return { id: nodeId, title: data.nodes[nodeId].title, isReference: true };
+    // Create a map to store unique nodes
+    const nodeMap = new Map();
+
+    // Function to get or create a node
+    function getNode(id) {
+        if (!nodeMap.has(id)) {
+            nodeMap.set(id, { id, children: [] });
         }
-        visited.add(nodeId);
-        const node = data.nodes[nodeId];
-        return {
-            id: node.id,
-            title: node.title,
-            children: node.choices.map(childId => buildHierarchy(childId, new Set(visited)))
-        };
+        return nodeMap.get(id);
     }
 
-    const hierarchy = buildHierarchy(data.rootId);
-    const root = d3.hierarchy(hierarchy);
+    // Build the graph structure
+    Object.values(data.nodes).forEach(node => {
+        const parent = getNode(node.id);
+        parent.title = node.title;
+        node.choices.forEach(childId => {
+            const child = getNode(childId);
+            if (!parent.children.includes(child)) {
+                parent.children.push(child);
+            }
+        });
+    });
 
-    const tree = d3.tree().size([width - 100, treeHeight]).separation((a, b) => (a.parent == b.parent ? 1 : 1.2) * 20);
+    const root = d3.hierarchy(getNode(data.rootId));
+
+    const tree = d3.tree().size([width - 100, treeHeight]).nodeSize([80, 200]);
     tree(root);
 
-    // Creiamo i link, includendo quelli per i nodi di riferimento
+    // Create links
     const link = g.selectAll(".link")
-        .data(root.links().concat(root.descendants().filter(d => d.data.isReference).map(d => ({source: d.parent, target: d}))))
+        .data(root.links())
         .enter().append("path")
         .attr("class", "link")
         .attr("d", d3.linkVertical()
             .x(d => d.x)
             .y(d => d.y));
 
+    // Create nodes
     const node = g.selectAll(".node")
         .data(root.descendants())
         .enter().append("g")
-        .attr("class", d => "node" + (d.data.isReference ? " reference" : ""))
+        .attr("class", "node")
         .attr("transform", d => `translate(${d.x},${d.y})`);
 
     node.append("circle")
@@ -128,7 +136,7 @@ function createTree(data) {
         .style("text-anchor", "middle")
         .text(d => d.data.title);
 
-    // Aggiungi zoom e pan
+    // Add zoom and pan
     const zoom = d3.zoom()
         .scaleExtent([0.5, 3])
         .on("zoom", (event) => {
@@ -137,7 +145,7 @@ function createTree(data) {
 
     svg.call(zoom);
 
-    // Centra inizialmente l'albero
+    // Center the tree initially
     const initialScale = 0.8;
     const initialTranslateX = (width - width * initialScale) / 2;
     const initialTranslateY = (height - treeHeight * initialScale) / 2;
