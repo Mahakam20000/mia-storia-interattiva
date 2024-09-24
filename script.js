@@ -78,30 +78,34 @@ function createTree(data) {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${verticalMargin})`);
 
-    // Create all nodes upfront
-    const nodes = Object.keys(data.nodes).map(id => ({
-        id: id,
-        title: data.nodes[id].title,
-        children: []
-    }));
+    // Funzione ricorsiva per costruire l'albero
+    function buildHierarchy(nodeId, visited = new Set()) {
+        if (visited.has(nodeId)) {
+            return null; // Evita cicli infiniti
+        }
+        visited.add(nodeId);
+        
+        const node = data.nodes[nodeId];
+        return {
+            id: nodeId,
+            title: node.title,
+            children: node.choices
+                .map(childId => buildHierarchy(childId, new Set(visited)))
+                .filter(Boolean)
+        };
+    }
 
-    // Create a map for quick node lookup
-    const nodeMap = new Map(nodes.map(node => [node.id, node]));
+    // Costruisci la gerarchia partendo dal nodo radice
+    const hierarchyData = buildHierarchy(data.rootId);
 
-    // Build the tree structure
-    nodes.forEach(node => {
-        const choices = data.nodes[node.id].choices;
-        node.children = choices.map(childId => nodeMap.get(childId)).filter(Boolean);
-    });
+    // Crea la gerarchia D3
+    const root = d3.hierarchy(hierarchyData);
 
-    // Create the hierarchy
-    const root = d3.hierarchy(nodeMap.get(data.rootId));
+    // Crea il layout dell'albero
+    const treeLayout = d3.tree().size([width - 100, treeHeight]);
+    treeLayout(root);
 
-    // Create a tree layout
-    const tree = d3.tree().size([width - 100, treeHeight]);
-    tree(root);
-
-    // Create links
+    // Crea i collegamenti
     const link = g.selectAll(".link")
         .data(root.links())
         .enter().append("path")
@@ -110,7 +114,7 @@ function createTree(data) {
             .x(d => d.x)
             .y(d => d.y));
 
-    // Create nodes
+    // Crea i nodi
     const node = g.selectAll(".node")
         .data(root.descendants())
         .enter().append("g")
@@ -127,7 +131,7 @@ function createTree(data) {
         .style("text-anchor", "middle")
         .text(d => d.data.title);
 
-    // Add zoom and pan
+    // Aggiungi zoom e pan
     const zoom = d3.zoom()
         .scaleExtent([0.5, 3])
         .on("zoom", (event) => {
@@ -136,7 +140,7 @@ function createTree(data) {
 
     svg.call(zoom);
 
-    // Center the tree initially
+    // Centra l'albero inizialmente
     const initialScale = 0.8;
     const initialTranslateX = (width - width * initialScale) / 2;
     const initialTranslateY = (height - treeHeight * initialScale) / 2;
