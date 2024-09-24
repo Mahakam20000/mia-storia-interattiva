@@ -78,28 +78,20 @@ function createTree(data) {
     const g = svg.append("g")
         .attr("transform", `translate(${width / 2},${verticalMargin})`);
 
-    // Funzione ricorsiva per costruire l'albero
-    function buildHierarchy(nodeId, visited = new Set()) {
-        if (visited.has(nodeId)) {
-            return null; // Evita cicli infiniti
-        }
-        visited.add(nodeId);
-        
-        const node = data.nodes[nodeId];
-        return {
-            id: nodeId,
-            title: node.title,
-            children: node.choices
-                .map(childId => buildHierarchy(childId, new Set(visited)))
-                .filter(Boolean)
-        };
-    }
+    // Crea una mappa di tutti i nodi
+    const nodeMap = new Map(Object.entries(data.nodes).map(([id, node]) => [id, { ...node, children: [] }]));
 
-    // Costruisci la gerarchia partendo dal nodo radice
-    const hierarchyData = buildHierarchy(data.rootId);
+    // Costruisci le relazioni genitore-figlio
+    nodeMap.forEach(node => {
+        node.choices.forEach(childId => {
+            if (nodeMap.has(childId.toString())) {
+                node.children.push(nodeMap.get(childId.toString()));
+            }
+        });
+    });
 
     // Crea la gerarchia D3
-    const root = d3.hierarchy(hierarchyData);
+    const root = d3.hierarchy(nodeMap.get(data.rootId.toString()));
 
     // Crea il layout dell'albero
     const treeLayout = d3.tree().size([width - 100, treeHeight]);
@@ -123,7 +115,7 @@ function createTree(data) {
 
     node.append("circle")
         .attr("r", 10)
-        .on("click", (event, d) => updateStory(data.nodes[d.data.id]));
+        .on("click", (event, d) => updateStory(d.data));
 
     node.append("text")
         .attr("dy", ".35em")
